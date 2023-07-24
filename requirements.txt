@@ -1,7 +1,6 @@
 fastapi==0.96.0
 uvicorn[standard]
 python-multipart
-markdown==3.4.3
 Pillow==9.5.0
 torchvision==0.14.0
 opencv-python-headless
@@ -10,7 +9,5 @@ craft-text-detector==0.4.3
 matplotlib==3.7.1
 easyocr==1.6.2
 segmentation_models_pytorch==0.3.2
-django-environ==0.10.0
 torch==1.13.0
-fastapi_mail
 pyzbar

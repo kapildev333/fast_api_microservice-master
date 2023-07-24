@@ -4,14 +4,13 @@ import torch
 import easyocr
 from .processor_modules.face_detection_module.predict_submast import \
     UnetModel, Res34BackBone
-from .processor_modules import processor_utils as utils
 from .processor_modules.face_detection_module import find_face as detect_face
 from urllib.request import urlopen
 
-def driver_license_processor(img_path):
-    ori_thresh = 3  # Orientation angle threshold for skew correction
-    use_cuda = "cuda" if torch.cuda.is_available() else "cpu"
-    model = UnetModel(Res34BackBone(), use_cuda)
+async def driver_license_processor(img_path):
+    # ori_thresh = 3  # Orientation angle threshold for skew correction
+    # use_cuda = "cuda" if torch.cuda.is_available() else "cpu"
+    # model = UnetModel(Res34BackBone(), use_cuda)
     face_detector = detect_face.face_factory(face_model="ssd")
     find_face_id = face_detector.get_face_detector()
 
@@ -25,18 +24,16 @@ def driver_license_processor(img_path):
 
     final_img = find_face_id.changeOrientationUntilFaceFound(img1, 30)
 
-    txt_heat_map, regions = utils.createHeatMapAndBoxCoordinates(final_img)
-
-    txt_heat_map = cv2.cvtColor(txt_heat_map, cv2.COLOR_BGR2RGB)
-
-    predicted_mask = model.predict(txt_heat_map)
-
-    orientation_angle = utils.findOrientationofLines(predicted_mask.copy())
-
-    if abs(orientation_angle) > ori_thresh:
-        final_img = utils.rotateImage(orientation_angle, final_img)
-
-        txt_heat_map, regions = utils.createHeatMapAndBoxCoordinates(final_img)
+    # txt_heat_map, regions = utils.createHeatMapAndBoxCoordinates(final_img)
+    #
+    # txt_heat_map = cv2.cvtColor(txt_heat_map, cv2.COLOR_BGR2RGB)
+    #
+    # predicted_mask = model.predict(txt_heat_map)
+    #
+    # orientation_angle = utils.findOrientationofLines(predicted_mask.copy())
+    #
+    # if abs(orientation_angle) > ori_thresh:
+    #     final_img = utils.rotateImage(orientation_angle, final_img)
 
     reader = easyocr.Reader(['en'])
     result = reader.readtext(final_img, detail=0)

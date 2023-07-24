@@ -71,7 +71,7 @@ def readBBoxCordinatesAndCenters(coordinates_txt):
             centers.append((cX, cY))
             bbox = (int(x), w, int(y), h)
             boxes.append(bbox)
-    print("number of boxes", len(boxes))
+    # print("number of boxes", len(boxes))
     return np.array(boxes), np.array(centers)
 
 
@@ -286,7 +286,7 @@ def load_images_from_folder(folder):
     images = []
     for filename in os.listdir(folder):
         img = cv2.imread(os.path.join(folder, filename))
-        print("filename:", filename)
+        # print("filename:", filename)
         if img is not None:
             images.append(img)
 

@@ -139,7 +139,7 @@ class OcrFactory:
         if (ocr_method == "EasyOcr"):
             return EasyOcr(border_thresh, denoise)
 
-        print("Invalid Mehod")
+        # print("Invalid Mehod")
         return -1
 
 

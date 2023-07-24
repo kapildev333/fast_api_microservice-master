@@ -1,13 +1,11 @@
 import os
 
-from pydantic import BaseSettings
 
 from app.driver_license_processor import ocr_text_processor
 import cv2
 from pathlib import Path
 import shutil
-import environ
-from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
+
 from urllib.request import urlopen
 import numpy as np
 from pyzbar.pyzbar import decode
@@ -92,7 +90,7 @@ def send_common_response_for_verification(send_empty, driving_license=None, qr_c
         return common_response
 
 
-def process_result(result, user_name):
+async def process_result(result, user_name):
     """
     :param result: The list of what OCR has found in id card
     :param user_name: Name of user.so we can verify that person name is matching in id-card with user_name
@@ -109,7 +107,7 @@ def process_result(result, user_name):
     return ocr_text_processor.detect_details(result, user_name=user_name)
 
 
-def detect_qr_code(img_path):
+async def detect_qr_code(img_path):
     # final_path = str(settings.BASE_DIR) + img_path
     resp = urlopen(img_path)
     image = np.asarray(bytearray(resp.read()), dtype="uint8")
@@ -149,10 +147,14 @@ def return_path(file, user_name):
 def delete_directory():
     dir_path = os.path.join(os.getcwd(), "uploads")
     output_dir_path = os.path.join(os.getcwd(), "outputs")
-    try:
-        shutil.rmtree(dir_path)
-        shutil.rmtree(output_dir_path)
-    except OSError as x:
-        print("Error occured: %s : %s" % (dir_path, x.strerror))
-    finally:
+    if os.path.exists(dir_path) or os.path.exists(output_dir_path):
+        try:
+            shutil.rmtree(dir_path)
+            shutil.rmtree(output_dir_path)
+        except OSError as x:
+            print("Error occured: %s : %s" % (dir_path, x.strerror))
+        finally:
+            return
+    else:
         return
+

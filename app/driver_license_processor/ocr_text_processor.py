@@ -54,7 +54,7 @@ def verify_user_name(result, user_name) -> bool:
     :return: it will give true or false based on if we found name in driver license
     """
     list_of_names = user_name.split()
-    print(list_of_names)
+    # print(list_of_names)
     for string_data in result:
         for name in list_of_names:
             if string_data.lower().find(name.lower()) != -1:

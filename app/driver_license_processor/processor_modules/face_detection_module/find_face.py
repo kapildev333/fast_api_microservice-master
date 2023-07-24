@@ -111,7 +111,7 @@ class HaarFaceDetector(FaceDetector):
         num_of_faces = len(faces)
 
         if (num_of_faces):
-            print("Haar Number of Faces:", num_of_faces)
+            # print("Haar Number of Faces:", num_of_faces)
             return True
 
         return False
