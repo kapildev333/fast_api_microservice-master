@@ -116,7 +116,7 @@ async def detect_qr_code(img_path):
     image = np.asarray(bytearray(resp.read()))
     img = cv2.imdecode(image, cv2.IMREAD_GRAYSCALE)
     barcodes = decode(img)
-    print(barcodes)
+
     is_qr_detected = True if(len(barcodes)>0) else False
     back_side_data = {
         'is_qr_detected': is_qr_detected
