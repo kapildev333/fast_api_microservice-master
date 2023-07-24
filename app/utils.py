@@ -1,14 +1,17 @@
 import os
-
+import urllib.request
 
 from app.driver_license_processor import ocr_text_processor
 import cv2
 from pathlib import Path
 import shutil
 
+from PIL import Image
 from urllib.request import urlopen
 import numpy as np
 from pyzbar.pyzbar import decode
+from pyzbar.pyzbar import ZBarSymbol
+
 
 # class Settings(BaseSettings):
 #     env = environ.Env()
@@ -73,7 +76,7 @@ def send_common_response_for_verification(send_empty, driving_license=None, qr_c
     if qr_code_data is None:
         qr_code_data = {}
 
-    print(qr_code_data)
+    # print(qr_code_data)
     if send_empty:
 
         common_response = {'message': 'Fail', 'data': {
@@ -110,22 +113,15 @@ async def process_result(result, user_name):
 async def detect_qr_code(img_path):
     # final_path = str(settings.BASE_DIR) + img_path
     resp = urlopen(img_path)
-    image = np.asarray(bytearray(resp.read()), dtype="uint8")
-    img = cv2.imdecode(image, cv2.IMREAD_COLOR)
+    image = np.asarray(bytearray(resp.read()))
+    img = cv2.imdecode(image, cv2.IMREAD_GRAYSCALE)
     barcodes = decode(img)
-    isQrDetected = True if(len(barcodes)>0) else False
+    print(barcodes)
+    is_qr_detected = True if(len(barcodes)>0) else False
     back_side_data = {
-        'is_qr_detected': isQrDetected
+        'is_qr_detected': is_qr_detected
     }
-    dir_path = str(Path(__file__).resolve().parent.parent) + '/outputs'
-    dir_path1 = str(Path(__file__).resolve().parent.parent) + '/media'
-    try:
-        shutil.rmtree(dir_path)
-        shutil.rmtree(dir_path1)
-    except OSError as x:
-        print("Error occured: %s : %s" % (dir_path, x.strerror))
-    finally:
-        return back_side_data
+    return back_side_data
 
 
 def return_path(file, user_name):
@@ -147,14 +143,16 @@ def return_path(file, user_name):
 def delete_directory():
     dir_path = os.path.join(os.getcwd(), "uploads")
     output_dir_path = os.path.join(os.getcwd(), "outputs")
-    if os.path.exists(dir_path) or os.path.exists(output_dir_path):
-        try:
+    dir_path1 = str(Path(__file__).resolve().parent.parent) + '/media'
+    try:
+        if os.path.exists(dir_path):
             shutil.rmtree(dir_path)
+        if os.path.exists(output_dir_path):
             shutil.rmtree(output_dir_path)
-        except OSError as x:
-            print("Error occured: %s : %s" % (dir_path, x.strerror))
-        finally:
-            return
-    else:
-        return
+        if os.path.exists(dir_path1):
+            shutil.rmtree(dir_path1)
 
+    except OSError as x:
+        print("Error occured: %s : %s" % (dir_path, x.strerror))
+    finally:
+        return

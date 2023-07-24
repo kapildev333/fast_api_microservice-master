@@ -33,7 +33,7 @@ class JsonData:
     def loadDict(self):
         with open(self.dict_path, 'r', encoding='utf-8') as fp:
             data = json.load(fp)
-            print(data)
+            # print(data)
 
 
 class Ocr(ABC):
