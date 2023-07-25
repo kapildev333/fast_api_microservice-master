@@ -21,4 +21,4 @@ RUN pip3 install -r /code/requirements.txt
 
 COPY ./app /code/app
 
-CMD ["uvicorn", "app.main:app", "--proxy-headers", "--host", "0.0.0.0", "--port", "3000"]
+CMD ["gunicorn", "app.main:app", "--workers 3","--worker-class","uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:3000:3000"]
