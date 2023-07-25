@@ -1,11 +1,12 @@
+import os
+
 import cv2
 import numpy as np
-import torch
+
 import easyocr
-from .processor_modules.face_detection_module.predict_submast import \
-    UnetModel, Res34BackBone
 from .processor_modules.face_detection_module import find_face as detect_face
 from urllib.request import urlopen
+
 
 async def driver_license_processor(img_path):
     # ori_thresh = 3  # Orientation angle threshold for skew correction
@@ -16,7 +17,7 @@ async def driver_license_processor(img_path):
 
     resp = urlopen(img_path)
     image = np.asarray(bytearray(resp.read()), dtype="uint8")
-    src_image = cv2.imdecode(image, cv2.IMREAD_COLOR) # The image object
+    src_image = cv2.imdecode(image, cv2.IMREAD_COLOR)  # The image object
     # src_image = cv2.imread(img_path)
 
     crop = cv2.resize(src_image, (640, 448))
@@ -35,6 +36,7 @@ async def driver_license_processor(img_path):
     # if abs(orientation_angle) > ori_thresh:
     #     final_img = utils.rotateImage(orientation_angle, final_img)
 
-    reader = easyocr.Reader(['en'])
+    models_path = os.path.abspath(os.getcwd() + "/app" + "/ease_ocr_models")
+    reader = easyocr.Reader(['en'], model_storage_directory=models_path, download_enabled=False)
     result = reader.readtext(final_img, detail=0)
     return result

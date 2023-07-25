@@ -2,15 +2,13 @@ import os
 import urllib.request
 
 from app.driver_license_processor import ocr_text_processor
-import cv2
+
 from pathlib import Path
 import shutil
 
 from PIL import Image
-from urllib.request import urlopen
-import numpy as np
-from pyzbar.pyzbar import decode
-from pyzbar.pyzbar import ZBarSymbol
+
+import zxingcpp
 
 
 # class Settings(BaseSettings):
@@ -110,21 +108,26 @@ async def process_result(result, user_name):
     return ocr_text_processor.detect_details(result, user_name=user_name)
 
 
-async def detect_qr_code(img_path):
+async def detect_qr_code(img_path, user_name, email_address):
     # final_path = str(settings.BASE_DIR) + img_path
-    resp = urlopen(img_path)
-    image = np.asarray(bytearray(resp.read()))
-    img = cv2.imdecode(image, cv2.IMREAD_GRAYSCALE)
-    barcodes = decode(img)
+    file_path = return_path(user_name,email_address)
 
-    is_qr_detected = True if(len(barcodes)>0) else False
+    urllib.request.urlretrieve(
+        img_path,
+        file_path)
+
+    img = Image.open(file_path)
+    results = zxingcpp.read_barcodes(image=img)
+
+    is_qr_detected = True if (len(results) > 0) else False
     back_side_data = {
         'is_qr_detected': is_qr_detected
     }
+    await delete_file(file_path=file_path)
     return back_side_data
 
 
-def return_path(file, user_name):
+def return_path(file_name, user_name):
     # Access the user data
     upload_dir = os.path.join(os.getcwd(), "uploads", user_name)
     # Create the upload directory if it doesn't exist
@@ -132,15 +135,12 @@ def return_path(file, user_name):
         os.makedirs(upload_dir)
 
     # get the destination path
-    destination = os.path.join(upload_dir, file.filename)
-    print(destination)
-    with open(destination, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+    destination = os.path.join(upload_dir, file_name)
 
     return destination
 
 
-def delete_directory():
+async def delete_directory():
     dir_path = os.path.join(os.getcwd(), "uploads")
     output_dir_path = os.path.join(os.getcwd(), "outputs")
     dir_path1 = str(Path(__file__).resolve().parent.parent) + '/media'
@@ -154,5 +154,16 @@ def delete_directory():
 
     except OSError as x:
         print("Error occured: %s : %s" % (dir_path, x.strerror))
+    finally:
+        return
+
+
+async def delete_file(file_path):
+    try:
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
+    except OSError as x:
+        print("Error occured: %s : %s" % (file_path, x.strerror))
     finally:
         return

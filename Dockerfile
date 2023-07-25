@@ -12,8 +12,8 @@ ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y && apt-get install -y build-essential libzbar-dev 
-RUN apt-get install -y libzbar0
+RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
+#RUN apt-get install -y libzbar0
 COPY ./requirements.txt /code/requirements.txt
 RUN python3 -m pip install --upgrade pip
 RUN pip3 install -r /code/requirements.txt
